@@ -14,9 +14,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dotimeout/1.0/jquery.ba-dotimeout.min.js"></script>
-    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="https://raw.githubusercontent.com/kblecc/JPMaruMaru-View/refs/heads/main/css/lyrics.css" />
 
-    <link rel="stylesheet" href="/css/lyrics.css" />
+    <link rel="stylesheet" href="https://raw.githubusercontent.com/kblecc/JPMaruMaru-View/refs/heads/main/css/style.css" />
     <script>
       var jsonData = {};
 
@@ -60,6 +60,7 @@
         }
 
         const jsonUrl = `https://raw.githubusercontent.com/kblecc/JPMaruMaru-Archive/refs/heads/main/${id}.json`; // Construct the URL for the JSON file
+        console.log("Fetching JSON from:", jsonUrl); // Log the URL
         try {
           const response = await $.getJSON(jsonUrl);
           $("#LyricsList").html(response.lyrics); // Update the lyrics in the div
@@ -67,6 +68,7 @@
           onYouTubeIframeAPIReady(jsonData.videoID); // Initialize YouTube player with videoID
         } catch (error) {
           console.error("Error fetching the JSON data:", error);
+          alert("Failed to fetch song data: " + error.message); // Show the error message
           throw new Error("Failed to fetch song data.");
         }
       }
