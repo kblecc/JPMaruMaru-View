@@ -79,7 +79,7 @@
       function fetchSongData() {
         const id = getQueryParam('id'); // Get the 'id' parameter from the URL
         if (id) {
-          const jsonUrl = `https://yyy.com/${id}.json`; // Construct the URL for the JSON file
+          const jsonUrl = `https://raw.githubusercontent.com/kblecc/JPMaruMaru-Archive/refs/heads/main/${id}.json`; // Construct the URL for the JSON file
           $.getJSON(jsonUrl, function(data) {
             $('#LyricsList').html(data.lyrics); // Update the lyrics in the div
             onYouTubeIframeAPIReady(data.videoID); // Pass the videoID to the YouTube API function
