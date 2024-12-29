@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Music Cards</title>
+    <title>Music Collection</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .card {
@@ -16,11 +16,19 @@
             display: none;
             color: red;
         }
+        .section {
+            margin-top: 20px;
+        }
+        .nav-link {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div class="container mt-5">
         <h1 class="text-center">Music Collection</h1>
+        <input type="text" id="search" class="form-control mb-4" placeholder="Search by videoID, name, or singer...">
+        
         <div id="loading" class="text-center">
             <div class="spinner-border" role="status">
                 <span class="visually-hidden">Loading...</span>
@@ -28,16 +36,25 @@
             <p>Loading data...</p>
         </div>
         <div id="error" class="text-center"></div>
+        
         <div class="row" id="card-container">
             <!-- Cards will be injected here -->
+        </div>
+        
+        <div id="sidebar" class="position-fixed" style="top: 100px; left: 20px;">
+            <h5>Sections</h5>
+            <div id="nav-links"></div>
         </div>
     </div>
 
     <script>
-        const url = "https://raw.githubusercontent.com/kblecc/JPMaruMaru-View/refs/heads/main/list.json"; // Replace with your actual URL
+        const url = "http://xxx.com/db.json"; // Replace with your actual URL
         const cardContainer = document.getElementById('card-container');
         const loadingIndicator = document.getElementById('loading');
         const errorIndicator = document.getElementById('error');
+        const searchInput = document.getElementById('search');
+        const navLinksContainer = document.getElementById('nav-links');
+        let jsonData = [];
 
         // Show loading state
         loadingIndicator.style.display = 'block';
@@ -49,18 +66,27 @@
                 }
                 return response.json();
             })
-            .then(jsonData => {
-                // Hide loading state
+            .then(data => {
+                jsonData = data;
                 loadingIndicator.style.display = 'none';
+                displayCards(jsonData);
+                createSections(jsonData);
+            })
+            .catch(error => {
+                loadingIndicator.style.display = 'none';
+                errorIndicator.textContent = "Error fetching data: " + error.message;
+                errorIndicator.style.display = 'block';
+            });
 
-                // Check if data is empty
-                if (jsonData.length === 0) {
-                    errorIndicator.textContent = "No data found.";
-                    errorIndicator.style.display = 'block';
-                    return;
-                }
-
-                jsonData.forEach(item => {
+        function displayCards(data) {
+            cardContainer.innerHTML = '';
+            const groupedData = groupByFirstCharacter(data);
+            for (const [char, items] of Object.entries(groupedData)) {
+                const section = document.createElement('div');
+                section.className = 'section';
+                section.id = char;
+                section.innerHTML = `<h3>${char}</h3>`;
+                items.forEach(item => {
                     const card = document.createElement('div');
                     card.className = 'col-md-4 mb-4';
                     card.innerHTML = `
@@ -71,15 +97,50 @@
                             </div>
                         </div>
                     `;
-                    cardContainer.appendChild(card);
+                    section.appendChild(card);
                 });
-            })
-            .catch(error => {
-                // Hide loading state
-                loadingIndicator.style.display = 'none';
-                errorIndicator.textContent = "Error fetching data: " + error.message;
-                errorIndicator.style.display = 'block';
-            });
+                cardContainer.appendChild(section);
+            }
+        }
+
+        function createSections(data) {
+            const groupedData = groupByFirstCharacter(data);
+            navLinksContainer.innerHTML = '';
+            for (const char of Object.keys(groupedData)) {
+                const link = document.createElement('div');
+                link.className = 'nav-link';
+                link.textContent = char;
+                link.onclick = () => {
+                    document.getElementById(char).scrollIntoView({ behavior: 'smooth' });
+                };
+                navLinksContainer.appendChild (link);
+            }
+        }
+
+        function groupByFirstCharacter(data) {
+            return data.reduce((acc, item) => {
+                const firstChar = item.name.charAt(0);
+                if (!acc[firstChar]) {
+                    acc[firstChar] = [];
+                }
+                acc[firstChar].push(item);
+                return acc;
+            }, {});
+        }
+
+        let debounceTimer;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const filteredData = jsonData.filter(item => 
+                    item.id.toLowerCase().includes(searchTerm) || 
+                    item.name.toLowerCase().includes(searchTerm) || 
+                    item.singer.toLowerCase().includes(searchTerm)
+                );
+                displayCards(filteredData);
+            }, 500);
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
