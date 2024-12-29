@@ -67,10 +67,7 @@
       };
       $(document).ready(async function () {
         await fetchSongData();
-        var tag = document.createElement("script");
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName("script")[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        
       });
 
       // Function to get a specific query parameter by name
@@ -80,23 +77,33 @@
       }
 
       // Function to fetch song data based on the id from the URL
-      function fetchSongData() {
+      async function fetchSongData() {
         const id = getQueryParam("id"); // Get the 'id' parameter from the URL
         if (id) {
           const jsonUrl = `https://raw.githubusercontent.com/kblecc/JPMaruMaru-Archive/refs/heads/main/${id}.json`; // Construct the URL for the JSON file
           $.getJSON(jsonUrl, function (data) {
             $("#LyricsList").html(data.lyrics); // Update the lyrics in the div
-            jsonData = data;
+             jsonData = data;
+             initYoutubeIframe();
+            
           }).fail(function () {
             console.error("Error fetching the JSON data.");
           });
         } else {
           console.error("No id parameter found in the URL.");
-        }
+        } 
+        
       }
 
+      function initYoutubeIframe (){
+        var tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      }
+   
       // Instantiate the Player.
-      function onYouTubeIframeAPIReady(videoID) {
+      function onYouTubeIframeAPIReady() {
         var player = new YT.Player("player", {
           videoId: jsonData.videoID,
           width: "100%",
