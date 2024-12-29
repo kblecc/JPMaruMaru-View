@@ -16,12 +16,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dotimeout/1.0/jquery.ba-dotimeout.min.js"></script>
     <link
       rel="stylesheet"
-      href="https://raw.githubusercontent.com/kblecc/JPMaruMaru-View/refs/heads/main/css/lyrics.css"
+      href="css/lyrics.css"
     />
 
     <link
       rel="stylesheet"
-      href="https://raw.githubusercontent.com/kblecc/JPMaruMaru-View/refs/heads/main/css/style.css"
+      href="css/style.css"
     />
     <script>
       var jsonData = {};
@@ -288,6 +288,12 @@
     <div class="container-fluid">
       <div class="row 100-vh">
         <div class="col sticky-top" id="yt_info">
+          <div class="container" id="control">
+            <button type="button" class="btn btn-primary" id="theme-switch" onclick="history.back()">
+              Primary
+            </button>
+  
+          </div>
           <div id="player" class="yt_warpper"></div>
           <div class="container" id="control">
             <button
@@ -297,7 +303,7 @@
               data-bs-toggle="modal"
               data-bs-target="#setting_modal"
             >
-              Primary
+              ←
             </button>
             <button type="button" class="btn btn-primary" id="theme-switch">
               Primary
