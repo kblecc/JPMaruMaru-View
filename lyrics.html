@@ -7,57 +7,97 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
     />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<<<<<<< HEAD
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dotimeout/1.0/jquery.ba-dotimeout.min.js"></script>
     <link rel="stylesheet" href="https://raw.githubusercontent.com/kblecc/JPMaruMaru-View/refs/heads/main/css/lyrics.css" />
 
     <link rel="stylesheet" href="https://raw.githubusercontent.com/kblecc/JPMaruMaru-View/refs/heads/main/css/style.css" />
+=======
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dotimeout/1.0/jquery.ba-dotimeout.min.js"
+    ></script>
+    <link rel="stylesheet" href="/css/style.css">
+
+    <link rel="stylesheet" href="/css/lyrics.css">
+>>>>>>> parent of b6f97ad (Update lyrics.html)
     <script>
-      var jsonData = {};
-
-      $(document).ready(async function () {
-        // Theme switch functionality
+      $(document).ready(function () {
+   
+        
         document
-          .getElementById("theme-switch")
-          .addEventListener("click", toggleTheme);
-
-        // Fetch song data and initialize YouTube player
-        try {
-          await fetchSongData();
-          loadYouTubeAPI();
-        } catch (error) {
-          console.error("Error during initialization:", error);
-          alert("Failed to load song data. Please try again later.");
-        }
+          .getElementById('theme-switch')
+          .addEventListener('click', () => {
+            if (
+              document.documentElement.getAttribute('data-bs-theme') == 'dark'
+            ) {
+              document.documentElement.setAttribute('data-bs-theme', 'light');
+            } else {
+              document.documentElement.setAttribute('data-bs-theme', 'dark');
+            }
+          });
       });
 
-      // Toggle theme function
-      function toggleTheme() {
-        const currentTheme =
-          document.documentElement.getAttribute("data-bs-theme");
-        document.documentElement.setAttribute(
-          "data-bs-theme",
-          currentTheme === "dark" ? "light" : "dark"
-        );
-      }
+      var s_stop = 0;
+      jQuery.fn.scrollTo = function (elem, speed) {
+        if ($(window).width() < 500) {
+          $('html, body').animate(
+            {
+              scrollTop:
+                $(this).scrollTop() -
+                $(this).offset().top +
+                $(elem).offset().top,
+            },
+            speed == undefined ? 1000 : speed
+          );
+        } else {
+          $(this).animate(
+            {
+              scrollTop:
+                $(this).scrollTop() -
+                $(this).offset().top +
+                $(elem).offset().top,
+            },
+            speed == undefined ? 1000 : speed
+          );
+        }
+
+        return this;
+      };
+      $(document).ready(function () {     
+        await fetchSongData(); 
+        var tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      });
 
       // Function to get a specific query parameter by name
       function getQueryParam(param) {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(param);
       }
-
+      
       // Function to fetch song data based on the id from the URL
       async function fetchSongData() {
-        const id = getQueryParam("id"); // Get the 'id' parameter from the URL
-        if (!id) {
-          throw new Error("No id parameter found in the URL.");
+        const id = getQueryParam('id'); // Get the 'id' parameter from the URL
+        if (id) {
+          const jsonUrl = `https://raw.githubusercontent.com/kblecc/JPMaruMaru-Archive/refs/heads/main/${id}.json`; // Construct the URL for the JSON file
+          $.getJSON(jsonUrl, function(data) {
+            $('#LyricsList').html(data.lyrics); // Update the lyrics in the div
+            onYouTubeIframeAPIReady(data.videoID); // Pass the videoID to the YouTube API function
+          }).fail(function() {
+            console.error('Error fetching the JSON data.');
+          });
+        } else {
+          console.error('No id parameter found in the URL.');
         }
+<<<<<<< HEAD
 
         const jsonUrl = `https://raw.githubusercontent.com/kblecc/JPMaruMaru-Archive/refs/heads/main/${id}.json`; // Construct the URL for the JSON file
         console.log("Fetching JSON from:", jsonUrl); // Log the URL
@@ -79,117 +119,189 @@
         tag.src = "https://www.youtube.com/iframe_api";
         const firstScriptTag = document.getElementsByTagName("script")[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+=======
+>>>>>>> parent of b6f97ad (Update lyrics.html)
       }
 
       // Instantiate the Player.
       function onYouTubeIframeAPIReady(videoID) {
-        var player = new YT.Player("player", {
+        var player = new YT.Player('player', {
           videoId: videoID,
-          width: "100%",
+          width: '100%',
           events: {
             onReady: onPlayerReady,
             onStateChange: onPlayerStateChange,
           },
         });
       }
-
-      // Player ready event
+      //
       function onPlayerReady(e) {
-        $("#mtime").text(formatSec(e.target.getDuration())); // Display total duration
+        var ss = e.target.getDuration();
+        //console.log(formatSec(ss));
+        $('#mtime').text(formatSec(ss));
       }
 
-      // Player state change event
       function onPlayerStateChange(e) {
-        if (e.data === YT.PlayerState.PLAYING) {
-          $.doTimeout("showLyrics", 500, function () {
-            updateLyrics(e.target);
+        if (e.data == YT.PlayerState.PLAYING) {
+          $.doTimeout('showLyrics', 500, function () {
+            //console.log("showLyrics");
+
+            var mtime = Math.round(e.target.getCurrentTime()); //四捨五入現階段秒數
+            //console.log("mtime", mtime);
+            //console.log("mtime",typeof mtime);  //number
+            $('#mtime').text(formatSec(mtime)); //將秒數轉換成hh:mm:ss格式
+
+            var stList = $('.LyricsYomi').length;
+            console.log('stList', stList);
+
+            var r;
+            for (var i = 0; i < stList; i++) {
+              if (i != stList - 1) {
+                var st1 = convertLST($('.LyricsYomi').eq(i).attr('st')); //取得li標籤內的st屬性值，透過convertLST()轉換成秒數.毫秒
+                var st2 = convertLST(
+                  $('.LyricsYomi')
+                    .eq(i + 1)
+                    .attr('st')
+                );
+              } else {
+                var st3 = convertLST(
+                  $('.LyricsYomi')
+                    .eq(stList - 1)
+                    .attr('st')
+                );
+              }
+
+              //console.log("st1", st1);
+              //console.log("st2", st2);
+              if (mtime < st1) {
+                r = -1;
+                console.log(r);
+                break;
+              } else if (mtime >= st1 && mtime < st2) {
+                r = i;
+                console.log(r);
+                break;
+              } else if (mtime >= st3) {
+                r = -2;
+                console.log(r);
+                break;
+              }
+            }
+            if (r > -1) {
+              var sn1 = $('.LyricsYomi').eq(r).html();
+              var sn2 = $('.Translate_zh').eq(r).html();
+              var sn =
+                "<li lang='ja' class='li3'>" +
+                sn1 +
+                "</li><li class='li4'>" +
+                sn2 +
+                '</li>';
+              $('#ly').html(sn);
+              //console.log(r);
+              $('.LyricsYomi').css('color', 'var(--bs-primary-text-emphasis)');
+
+              $('.Translate_zh').css('color', 'gray');
+
+              $('.LyricsYomi')
+                .eq(r - 1)
+                .css('font-size', '1rem');
+
+              $('.LyricsYomi').eq(r).css('color', 'red');
+              $('.Translate_zh').eq(r).css('color', 'red');
+
+              if (s_stop !== r) {
+                var section = $('.LyricsYomi[sn=' + r + ']');
+                $('.s_lyrics').scrollTo(section, 500);
+                console.log('scroll', section);
+                $('.LyricsYomi')
+                  .eq(r - 1)
+                  .animate({ zoom: '100%' }, 200);
+                $('.LyricsYomi').eq(r).animate({ zoom: '180%' }, 200);
+                $('.Translate_zh')
+                  .eq(r - 1)
+                  .animate({ zoom: '100%' }, 200);
+                $('.Translate_zh').eq(r).animate({ zoom: '150%' }, 200);
+                s_stop = r;
+              }
+            } else if (r == -1) {
+              //$("#ly").html("<li class='li4'>雪花 - 中島美嘉</li>");
+            } else if (r == -2) {
+              $('#ly').html("<li class='li4'>雪花 - 中島美嘉</li>");
+            }
+            //
+            return true;
           });
         } else {
-          $.doTimeout("showLyrics"); // Clear doTimeout
+          //clearInterval(clock);
+          $.doTimeout('showLyrics'); // clear doTimeout
         }
       }
-
-      // Update lyrics based on current time
-      function updateLyrics(player) {
-        const mtime = Math.round(player.getCurrentTime());
-        $("#mtime").text(formatSec(mtime)); // Update current time display
-
-        const stList = $(".LyricsYomi").length;
-        let r = -1;
-
-        for (let i = 0; i < stList; i++) {
-          const st1 = convertLST($(".LyricsYomi").eq(i).attr("st"));
-          const st2 =
-            i < stList - 1
-              ? convertLST(
-                  $(".LyricsYomi")
-                    .eq(i + 1)
-                    .attr("st")
-                )
-              : Infinity;
-
-          if (mtime < st1) {
-            break;
-          } else if (mtime >= st1 && mtime < st2) {
-            r = i;
-            break;
-          }
-        }
-
-        if (r > -1) {
-          displayCurrentLyrics(r);
-        }
-      }
-
-      // Display current lyrics
-      function displayCurrentLyrics(index) {
-        const sn1 = $(".LyricsYomi").eq(index).html();
-        const sn2 = $(".Translate_zh").eq(index).html();
-        const sn = `<li lang='ja' class='li3'>${sn1}</li><li class='li4'> ${sn2}</li>`;
-        $("#ly").html(sn);
-        $(".LyricsYomi").css("color", "var(--bs-primary-text-emphasis)");
-        $(".Translate_zh").css("color", "gray");
-        $(".LyricsYomi").eq(index).css("color", "red");
-        $(".Translate_zh").eq(index).css("color", "red");
-
-        const section = $(".LyricsYomi[sn=" + index + "]");
-        $(".s_lyrics").scrollTo(section, 500);
-      }
-
-      // Convert time string to seconds
+      //
+      //自訂函數
+      //
+      var LST = 0; //提早秒數
       function convertLST(a) {
-        const b = convertTimeToSec(a);
-        return (b - parseFloat(LST)).toFixed(3);
+        var b = convertTimeToSec(a); //將 st的字串時間轉換為秒數.毫秒
+        //console.log("b", b);
+        return (b - parseFloat(LST)).toFixed(3); //減去要提早的秒數 四捨五入取3位
       }
 
-      // Convert time format to seconds
       function convertTimeToSec(c) {
-        const e =
+        //正則表達式 判斷是否符合 00:00:00.000格式
+        var e =
           /^(([0-1][0-9])|([2][0-3])):(([0-5][0-9])):(([0-5][0-9])).(([0-9][0-9][0-9]))$/;
-        if (!e.test(c)) return "";
-        const [b, g, a, d] = [
-          c.substr(0, 2),
-          c.substr(3, 2),
-          c.substr(6, 2),
-          c.substr(9, 3),
-        ];
-        return b * 3600 + g * 60 + +a + d / 1000;
+
+        //RegExp.prototype.test()：檢測字串是否包含，回傳 true/false
+        if (!e.test(c)) {
+          return '';
+        }
+        //str.substr(start[, length])
+        var b = c.substr(0, 2); //時
+        //console.log("b-"+ b);
+        var g = c.substr(3, 2); //分
+        //console.log("g-"+ g);
+        var a = c.substr(6, 2); //秒
+        //console.log("a-"+ a);
+        var d = c.substr(9, 3); //毫秒
+        //console.log("d-"+ d);
+        var f = b * 60 * 60 + g * 60 + a * 1 + d / 1000; //總時間轉換為秒數.毫秒
+        //console.log("f-" + f);
+        return f;
       }
 
-      // Format seconds into hh:mm:ss
       function formatSec(seconds) {
-        const daySec = 86400,
-          hourSec = 3600,
-          minuteSec = 60;
-        const dd = Math.floor(seconds / daySec);
-        const hh = Math.floor((seconds % daySec) / hourSec);
-        const mm = Math.floor((seconds % hourSec) / minuteSec);
-        const ss = seconds % minuteSec;
-
-        return [dd, hh, mm, ss]
-          .map((v) => (v < 10 ? "0" + v : v))
-          .join(":")
-          .replace(/^00:/, "");
+        var daySec = 24 * 60 * 60;
+        var hourSec = 60 * 60;
+        var minuteSec = 60;
+        var dd = Math.floor(seconds / daySec);
+        if (dd < 10) {
+          dd = '0' + dd;
+        }
+        //console.log(dd);
+        var hh = Math.floor((seconds % daySec) / hourSec);
+        if (hh < 10) {
+          hh = '0' + hh;
+        }
+        //console.log(hh);
+        var mm = Math.floor((seconds % hourSec) / minuteSec);
+        if (mm < 10) {
+          mm = '0' + mm;
+        }
+        //console.log(mm);
+        var ss = seconds % minuteSec;
+        if (ss < 10) {
+          ss = '0' + ss;
+        }
+        //console.log(ss);
+        if (parseInt(dd, 10) > 0) {
+          return dd + ':' + hh + ':' + mm + ':' + ss;
+        } else if (parseInt(hh, 10) > 0) {
+          return '00:' + hh + ':' + mm + ':' + ss;
+        } else if (parseInt(mm, 10) > 0) {
+          return '00:' + mm + ':' + ss;
+        } else {
+          return '00:00:' + ss;
+        }
       }
     </script>
   </head>
@@ -213,7 +325,7 @@
             </button>
             <span id="mtime">--.---</span>
           </div>
-
+          
           <div class="table-tr">
             <div class="table-td showly">
               <span id="ly">
@@ -235,6 +347,7 @@
               </span>
             </div>
           </div>
+          
         </div>
 
         <div class="col s_lyrics">
@@ -244,7 +357,9 @@
             title=""
             style="padding: 10px; width: 558.667px"
             data-options="collapsible:true,collapsed:false"
-          ></div>
+          >
+           
+          </div>
         </div>
       </div>
     </div>
